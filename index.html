@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>إدارة الغنم</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0a;--card:#161616;--border:#2a2a2a;--text:#f5f5f5;--muted:#888;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--blue:#60a5fa;--orange:#fb923c;--purple:#a78bfa}
+html,body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh}
+#app{max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#111;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:16px;font-weight:800}
+.tabs{display:flex;overflow-x:auto;background:#111;border-bottom:1px solid var(--border);scrollbar-width:none;position:sticky;top:49px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;padding:10px 6px;font-size:13px;font-family:'Tajawal',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;text-align:center}
+.tab.active{color:#fff;border-bottom-color:#fff;font-weight:700}
+.content{flex:1;padding:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.lbl{color:var(--muted);font-size:13px}
+.val{font-size:14px;font-weight:600}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.bg-green{background:#14532d;color:var(--green)}
+.bg-blue{background:#0c1a2e;color:var(--blue)}
+.bg-yellow{background:#451a03;color:var(--yellow)}
+.bg-red{background:#450a0a;color:var(--red)}
+.bg-purple{background:#2e1065;color:var(--purple)}
+.bg-orange{background:#431407;color:var(--orange)}
+.bg-gray{background:#1f2937;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border-radius:8px;border:none;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-green{background:#166534;color:#fff}
+.btn-red{background:#7f1d1d;color:#fff}
+.btn-gray{background:#374151;color:#fff}
+.btn-blue{background:#1e3a5f;color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px;width:auto;margin-bottom:0}
+.btn-xs{padding:3px 8px;font-size:11px;width:auto;margin-bottom:0;border-radius:6px}
+input,select,textarea{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;padding:10px 12px;width:100%;outline:none;margin-bottom:10px}
+input:focus,select:focus,textarea:focus{border-color:#555}
+textarea{resize:vertical;min-height:60px}
+.field-lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:#0f0f0f;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-box .num{font-size:22px;font-weight:800}
+.stat-box .lbl2{font-size:11px;color:var(--muted);margin-top:3px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:20px;max-height:92vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.close-btn{background:none;border:none;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+.empty{text-align:center;color:var(--muted);padding:40px;font-size:15px}
+.mother-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.mother-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#1a1a1a}
+.mother-body{padding:12px 14px;border-top:1px solid var(--border)}
+.child-item{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:7px}
+.child-item:last-child{margin-bottom:0}
+select option{background:#161616}
+.search-bar{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:14px;padding:9px 12px;width:100%;outline:none;margin-bottom:12px}
+.divider{height:1px;background:var(--border);margin:12px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyA4zxC4MViCtL3m-tIV5jkFWiovArPQ7tg",
+  authDomain:"sheep-fee76.firebaseapp.com",
+  projectId:"sheep-fee76",
+  storageBucket:"sheep-fee76.firebasestorage.app",
+  messagingSenderId:"209017376146",
+  appId:"1:209017376146:web:e449c47bf0da0451ef054b"
+});
+var db=firebase.firestore();
+
+// ─── STATE ───
+var S={tab:"home",modal:null,mothers:{},rams:{},expanded:{},typeFilter:"الكل"};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,4);}
+function fd(s){if(!s)return"—";var d=new Date(s);return isNaN(d)?"—":d.toLocaleDateString("en-GB");}
+function today(){return new Date().toISOString().split("T")[0];}
+
+// ─── FIRESTORE ───
+async function loadData(){
+  try{
+    var ms=await db.collection("sheep_mothers").get();
+    ms.forEach(d=>{S.mothers[d.id]=d.data();});
+    var rs=await db.collection("sheep_rams").get();
+    rs.forEach(d=>{S.rams[d.id]=d.data();});
+  }catch(e){console.warn(e);}
+  render();
+}
+
+async function saveMother(m){S.mothers[m.id]=m;try{await db.collection("sheep_mothers").doc(m.id).set(m);}catch(e){}render();}
+async function deleteMother(id){delete S.mothers[id];try{await db.collection("sheep_mothers").doc(id).delete();}catch(e){}render();}
+async function saveRam(r){S.rams[r.id]=r;try{await db.collection("sheep_rams").doc(r.id).set(r);}catch(e){}render();}
+async function deleteRam(id){delete S.rams[id];try{await db.collection("sheep_rams").doc(id).delete();}catch(e){}render();}
+
+// ─── RENDER ───
+function h(tag,props){
+  var el=document.createElement(tag);
+  if(props)Object.entries(props).forEach(([k,v])=>{
+    if(k==="cls")el.className=v;
+    else if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
+    else if(k[0]==="o"&&k[1]==="n")el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="html")el.innerHTML=v;
+    else el.setAttribute(k,v);
+  });
+  for(var i=2;i<arguments.length;i++){
+    var c=arguments[i];
+    if(c==null)continue;
+    if(Array.isArray(c)){c.forEach(x=>{if(x!=null)el.appendChild(typeof x==="string"?document.createTextNode(x):x);});}
+    else el.appendChild(typeof c==="string"||typeof c==="number"?document.createTextNode(String(c)):c);
+  }
+  return el;
+}
+function set(p){Object.assign(S,p);render();}
+
+function render(){
+  var app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(rTopbar());
+  app.appendChild(rTabs());
+  var c=h("div",{cls:"content"});
+  c.appendChild(rPage());
+  app.appendChild(c);
+  if(S.modal)app.appendChild(rModal());
+}
+
+function rTopbar(){
+  var btns={home:"+ نعجة",rams:"+ كبش"};
+  var actions={
+    home:()=>set({modal:{type:"addMother"}}),
+    rams:()=>set({modal:{type:"addRam"}}),
+  };
+  return h("div",{cls:"topbar"},
+    h("div",{cls:"topbar-title"},"🐑 إدارة الغنم"),
+    actions[S.tab]?h("button",{cls:"btn btn-green btn-sm",onClick:actions[S.tab]},btns[S.tab]):h("div",{})
+  );
+}
+
+function rTabs(){
+  var bar=h("div",{cls:"tabs"});
+  [{id:"home",l:"🐑 النعاج"},{id:"rams",l:"🐏 الكباش"},{id:"stats",l:"📊 الإحصائيات"}]
+    .forEach(t=>bar.appendChild(h("button",{cls:"tab"+(S.tab===t.id?" active":""),onClick:()=>set({tab:t.id,modal:null})},t.l)));
+  return bar;
+}
+
+function rPage(){
+  if(S.tab==="home")return rMothers();
+  if(S.tab==="rams")return rRams();
+  if(S.tab==="stats")return rStats();
+  return h("div",{cls:"empty"},"قريباً");
+}
+
+// ─── النعاج ───
+function rMothers(){
+  var w=h("div",{});
+  var mothers=Object.values(S.mothers).sort((a,b)=>parseInt(a.number)-parseInt(b.number));
+
+  if(!mothers.length){
+    w.appendChild(h("div",{cls:"empty"},"🐑\nلا توجد نعاج بعد\nاضغط + نعجة لإضافة أول نعجة"));
+    return w;
+  }
+
+  var typeFilter=S.typeFilter||"الكل";
+  var typBar=h("div",{style:{display:"flex",gap:"6px",marginBottom:"12px"}});
+  ["الكل","حامل","عندها خروف"].forEach(function(t){
+    typBar.appendChild(h("button",{
+      cls:"btn btn-sm",
+      style:{background:typeFilter===t?"#fff":"#1f2937",color:typeFilter===t?"#000":"#fff",flex:"1"},
+      onClick:()=>set({typeFilter:t})
+    },t));
+  });
+  w.appendChild(typBar);
+
+  var si=h("input",{cls:"search-bar",type:"text",placeholder:"🔍 بحث بالاسم أو الرقم..."});
+  w.appendChild(si);
+
+  var filtered=typeFilter==="حامل"?mothers.filter(m=>m.pregnant):
+               typeFilter==="عندها خروف"?mothers.filter(m=>!m.pregnant&&(m.children||[]).length>0):
+               mothers;
+
+  var list=h("div",{});
+  function renderList(q){
+    list.innerHTML="";
+    var f=q?filtered.filter(m=>m.name.includes(q)||(m.number+"").includes(q)):filtered;
+    if(!f.length){list.appendChild(h("div",{cls:"empty"},"لا توجد نتائج"));return;}
+    f.forEach(m=>list.appendChild(buildMotherCard(m)));
+  }
+  si.addEventListener("input",e=>renderList(e.target.value.trim()));
+  renderList("");
+  w.appendChild(list);
+  return w;
+}
+
+function buildMotherCard(m){
+  var children=m.children||[];
+  var pregnant=m.pregnant||false;
+  var expanded=S.expanded[m.id];
+
+  var card=h("div",{cls:"mother-card"});
+
+  var hdr=h("div",{cls:"mother-header",onClick:()=>{
+    var ex={...S.expanded};
+    ex[m.id]=!ex[m.id];
+    set({expanded:ex});
+  }});
+
+  var hRight=h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}});
+  hRight.appendChild(h("span",{style:{fontSize:"22px"}},"🐑"));
+  var hInfo=h("div",{});
+  hInfo.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px"}},m.number+". "+m.name));
+  var badgeRow=h("div",{style:{display:"flex",gap:"6px",marginTop:"4px",alignItems:"center"}});
+  badgeRow.appendChild(h("span",{style:{fontSize:"11px",color:"var(--muted)"}},"رقم: "+m.number));
+  if(pregnant){
+    badgeRow.appendChild(h("span",{cls:"badge bg-blue"},"حامل 🤰"));
+  } else if(children.length>0){
+    badgeRow.appendChild(h("span",{cls:"badge bg-orange"},"عندها خروف"));
+  }
+  hInfo.appendChild(badgeRow);
+  hRight.appendChild(hInfo);
+
+  hdr.appendChild(h("span",{style:{color:"var(--muted)",fontSize:"18px"}},expanded?"▲":"▼"));
+  hdr.appendChild(hRight);
+  card.appendChild(hdr);
+
+  if(!expanded){return card;}
+
+  var body=h("div",{cls:"mother-body"});
+
+  // بيانات النعجة
+  if(m.birthDate){
+    body.appendChild(h("div",{cls:"row"},
+      h("span",{cls:"lbl"},"تاريخ الميلاد"),
+      h("span",{style:{fontSize:"13px"}},fd(m.birthDate))
+    ));
+  }
+  if(m.notes){
+    body.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",marginBottom:"8px"}},m.notes));
+  }
+
+  // الحمل
+  if(pregnant){
+    var pregBox=h("div",{style:{background:"#1a0a2e",border:"1px solid #6b21a8",borderRadius:"8px",padding:"10px",marginBottom:"10px"}});
+    pregBox.appendChild(h("div",{style:{fontSize:"12px",color:"#c084fc",fontWeight:"700",marginBottom:"4px"}},"🤰 حامل"));
+    if(m.pregnantFather) pregBox.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"الأب"),h("span",{style:{fontSize:"13px"}},m.pregnantFather)));
+    if(m.pregnantDate) pregBox.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"تاريخ التلقيح"),h("span",{style:{fontSize:"13px"}},fd(m.pregnantDate))));
+    if(m.pregnantNotes) pregBox.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted)",marginTop:"4px"}},m.pregnantNotes));
+    body.appendChild(pregBox);
+  }
+
+  // الخرفان
+  if(children.length){
+    body.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",marginBottom:"6px",fontWeight:"700"}},"الخرفان ("+children.length+")"));
+    children.forEach((ch,ci)=>{
+      var chCard=h("div",{cls:"child-item"});
+      var chTop=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}});
+      var chName=h("div",{style:{fontWeight:"700",fontSize:"13px"}});
+      chName.appendChild(h("span",{style:{fontSize:"18px"}},"🐑"));
+      chName.appendChild(document.createTextNode(" "+(ch.name||"خروف")+(ch.number?" — رقم: "+ch.number:"")));
+      chTop.appendChild(chName);
+      chTop.appendChild(h("span",{cls:"badge "+(ch.gender==="ذكر"?"bg-blue":"bg-green")},ch.gender));
+      chCard.appendChild(chTop);
+      if(ch.father) chCard.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"الأب"),h("span",{style:{fontSize:"13px"}},ch.father)));
+      if(ch.birthDate) chCard.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"تاريخ الميلاد"),h("span",{style:{fontSize:"13px"}},fd(ch.birthDate))));
+      if(ch.notes) chCard.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted)",marginTop:"4px"}},ch.notes));
+      chCard.appendChild(h("div",{style:{display:"flex",gap:"6px",marginTop:"8px"}},
+        h("button",{cls:"btn btn-gray btn-xs",onClick:()=>set({modal:{type:"editChild",mid:m.id,ci}})},"✏️ تعديل"),
+        h("button",{cls:"btn btn-red btn-xs",onClick:async()=>{
+          if(!confirm("حذف هذا الخروف؟"))return;
+          var updated={...m,children:children.filter((_,i)=>i!==ci)};
+          await saveMother(updated);
+        }},"🗑 حذف")
+      ));
+      body.appendChild(chCard);
+    });
+  }
+
+  body.appendChild(h("div",{cls:"divider"}));
+  body.appendChild(h("div",{style:{display:"flex",gap:"6px",flexWrap:"wrap"}},
+    h("button",{cls:"btn btn-blue btn-sm",onClick:()=>set({modal:{type:"addChild",mid:m.id}})},"+ إضافة خروف"),
+    h("button",{cls:"btn btn-gray btn-sm",onClick:()=>set({modal:{type:"editMother",mid:m.id}})},"✏️ تعديل"),
+    h("button",{cls:"btn btn-sm",style:{background:pregnant?"#166534":"#4c1d95",color:"#fff"},
+      onClick:()=>set({modal:{type:"pregnant",mid:m.id}})},
+      pregnant?"✅ تعديل الحمل":"🤰 تسجيل حمل"),
+    h("button",{cls:"btn btn-red btn-sm",onClick:async()=>{
+      if(!confirm("حذف النعجة '"+m.name+"' وجميع خرفانها؟"))return;
+      await deleteMother(m.id);
+    }},"🗑 حذف")
+  ));
+
+  card.appendChild(body);
+  return card;
+}
+
+// ─── الكباش ───
+function rRams(){
+  var w=h("div",{});
+  var rams=Object.values(S.rams).sort((a,b)=>parseInt(a.number||0)-parseInt(b.number||0));
+
+  if(!rams.length){
+    w.appendChild(h("div",{cls:"empty"},"🐏\nلا توجد كباش بعد\nاضغط + كبش لإضافة أول كبش"));
+    return w;
+  }
+
+  rams.forEach(r=>{
+    var count=0;
+    Object.values(S.mothers).forEach(m=>{
+      (m.children||[]).forEach(ch=>{if(ch.father===r.name)count++;});
+    });
+    var card=h("div",{cls:"card"});
+    card.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}},
+      h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}},
+        h("span",{style:{fontSize:"22px"}},"🐏"),
+        h("div",{},
+          h("div",{style:{fontWeight:"800",fontSize:"14px"}},r.name),
+          h("div",{style:{fontSize:"12px",color:"var(--muted)"}},"رقم: "+r.number)
+        )
+      ),
+      count>0?h("span",{cls:"badge bg-blue"},count+" خروف"):h("span",{})
+    ));
+    if(r.birthDate) card.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"تاريخ الميلاد"),h("span",{style:{fontSize:"13px"}},fd(r.birthDate))));
+    if(r.notes) card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",marginTop:"6px"}},r.notes));
+    card.appendChild(h("div",{style:{display:"flex",gap:"6px",marginTop:"10px"}},
+      h("button",{cls:"btn btn-gray btn-sm",onClick:()=>set({modal:{type:"editRam",rid:r.id}})},"✏️ تعديل"),
+      h("button",{cls:"btn btn-red btn-sm",onClick:async()=>{
+        if(!confirm("حذف الكبش '"+r.name+"'؟"))return;
+        await deleteRam(r.id);
+      }},"🗑 حذف")
+    ));
+    w.appendChild(card);
+  });
+  return w;
+}
+
+// ─── الإحصائيات ───
+function rStats(){
+  var w=h("div",{});
+  var mothers=Object.values(S.mothers);
+  var rams=Object.values(S.rams).sort((a,b)=>parseInt(a.number||0)-parseInt(b.number||0));
+  var allChildren=[];
+  mothers.forEach(m=>(m.children||[]).forEach(c=>allChildren.push(c)));
+
+  var pregnant=mothers.filter(m=>m.pregnant).length;
+  var withLambs=mothers.filter(m=>!m.pregnant&&(m.children||[]).length>0).length;
+  var males=allChildren.filter(c=>c.gender==="ذكر").length;
+  var females=allChildren.filter(c=>c.gender==="أنثى").length;
+
+  var grid=h("div",{cls:"stat-grid"});
+  [
+    [String(mothers.length),"إجمالي النعاج","var(--orange)"],
+    [String(pregnant),"حوامل","var(--purple)"],
+    [String(withLambs),"عندها خروف","var(--orange)"],
+    [String(rams.length),"الكباش","var(--blue)"],
+    [String(males),"مواليد ذكور","var(--blue)"],
+    [String(females),"مواليد إناث","var(--green)"],
+    [String(allChildren.length),"إجمالي الخرفان","#fff"],
+    [String(mothers.length+rams.length+allChildren.length),"إجمالي الغنم","var(--yellow)"],
+  ].forEach(([n,l,c])=>{
+    grid.appendChild(h("div",{cls:"stat-box"},
+      h("div",{cls:"num",style:{color:c}},n),
+      h("div",{cls:"lbl2"},l)
+    ));
+  });
+  w.appendChild(grid);
+
+  // مواليد حسب الموسم (أكتوبر → مارس = موسم الغنم)
+  function getSeason(dateStr){
+    if(!dateStr)return null;
+    var d=new Date(dateStr);
+    if(isNaN(d))return null;
+    var y=d.getFullYear();
+    var mo=d.getMonth()+1;
+    if(mo>=10)return y+"/"+(y+1);
+    if(mo<=3)return(y-1)+"/"+y;
+    return null;
+  }
+  var seasonMap={};
+  allChildren.forEach(function(c){
+    var s=getSeason(c.birthDate);
+    if(!s)return;
+    if(!seasonMap[s])seasonMap[s]={males:0,females:0};
+    if(c.gender==="ذكر")seasonMap[s].males++;
+    else seasonMap[s].females++;
+  });
+  var seasons=Object.keys(seasonMap).sort().reverse();
+  if(seasons.length){
+    w.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",margin:"16px 0 10px",color:"var(--muted)"}},"🐣 مواليد حسب الموسم"));
+    seasons.forEach(function(s){
+      var d=seasonMap[s];
+      var total=d.males+d.females;
+      w.appendChild(h("div",{cls:"card",style:{padding:"12px 14px",marginBottom:"8px"}},
+        h("div",{style:{fontWeight:"800",fontSize:"14px",marginBottom:"8px",color:"#fff"}},"موسم "+s),
+        h("div",{style:{display:"flex",gap:"8px"}},
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px",color:"var(--blue)"}},String(d.males)),h("div",{cls:"lbl2"},"ذكور")),
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px",color:"var(--green)"}},String(d.females)),h("div",{cls:"lbl2"},"إناث")),
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px"}},String(total)),h("div",{cls:"lbl2"},"المجموع"))
+        )
+      ));
+    });
+  }
+
+  // زر التقرير الشهري
+  var now=new Date();
+  var monthNames=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  var currentMonth=monthNames[now.getMonth()]+" "+now.getFullYear();
+  w.appendChild(h("button",{cls:"btn btn-gray",style:{marginBottom:"16px"},onClick:function(){
+    var rows=mothers.map(function(m){
+      var children=m.children||[];
+      var status=m.pregnant?"حامل 🤰":children.length>0?"عندها خروف":"—";
+      return "<tr>"
+        +"<td style='text-align:center;font-weight:800'>"+m.number+"</td>"
+        +"<td style='font-weight:700'>"+m.name+"</td>"
+        +"<td style='text-align:center'>"+status+"</td>"
+        +"<td style='text-align:center'>"+children.length+"</td>"
+        +"<td style='font-size:12px;color:#555'>"+(m.notes||"—")+"</td>"
+        +"</tr>";
+    }).join("");
+    var pw=window.open("","_blank");
+    pw.document.write(`<!DOCTYPE html><html dir='rtl'><head><meta charset='UTF-8'>
+    <link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap' rel='stylesheet'>
+    <style>
+      *{box-sizing:border-box}
+      body{font-family:Tajawal,Arial,sans-serif;padding:16px;direction:rtl;font-size:13px;color:#111}
+      h2{text-align:center;font-size:20px;margin-bottom:4px}
+      h3{text-align:center;color:#555;font-size:12px;font-weight:400;margin-bottom:14px}
+      .summary{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+      .sum-box{border:1px solid #ddd;border-radius:6px;padding:8px 14px;text-align:center;min-width:90px}
+      .sum-box .n{font-size:20px;font-weight:800}
+      .sum-box .l{font-size:10px;color:#888;margin-top:2px}
+      table{width:100%;border-collapse:collapse;margin-bottom:16px}
+      th{background:#1a1a1a;color:#fff;padding:7px 10px;font-size:12px;text-align:right}
+      td{border:1px solid #e0e0e0;padding:6px 8px;vertical-align:middle}
+      tr:nth-child(even){background:#f9f9f9}
+      @media print{button{display:none!important}body{padding:8px}}
+    </style></head><body>
+    <h2>🐑 التقرير الشهري — ${currentMonth}</h2>
+    <h3>تاريخ الطباعة: ${now.toLocaleDateString("en-GB")} | إجمالي النعاج: ${mothers.length}</h3>
+    <div class='summary'>
+      <div class='sum-box'><div class='n'>${mothers.length}</div><div class='l'>إجمالي النعاج</div></div>
+      <div class='sum-box'><div class='n' style='color:purple'>${pregnant}</div><div class='l'>حوامل</div></div>
+      <div class='sum-box'><div class='n' style='color:blue'>${males}</div><div class='l'>مواليد ذكور</div></div>
+      <div class='sum-box'><div class='n' style='color:green'>${females}</div><div class='l'>مواليد إناث</div></div>
+      <div class='sum-box'><div class='n'>${allChildren.length}</div><div class='l'>إجمالي الخرفان</div></div>
+    </div>
+    <table>
+      <thead><tr><th>الرقم</th><th>الاسم</th><th>الصنف</th><th>عدد المواليد</th><th>ملاحظات</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style='text-align:center;margin-top:12px'>
+      <button onclick='window.print()' style='padding:10px 28px;font-size:14px;cursor:pointer;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-family:Tajawal'>🖨️ طباعة</button>
+    </div></body></html>`);
+    pw.document.close();
+  }},"🖨️ طباعة التقرير الشهري"));
+
+  // الكباش وأعداد خرفانهم
+  if(rams.length){
+    w.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",margin:"16px 0 10px",color:"var(--muted)"}},"🐏 الكباش وأعداد خرفانهم"));
+    rams.forEach(r=>{
+      var count=0,pregCount=0;
+      mothers.forEach(m=>{
+        (m.children||[]).forEach(ch=>{if(ch.father===r.name)count++;});
+        if(m.pregnant&&m.pregnantFather===r.name)pregCount++;
+      });
+      w.appendChild(h("div",{cls:"card",style:{padding:"10px 14px"}},
+        h("div",{style:{display:"flex",justifyContent:"space-between"}},
+          h("span",{style:{fontWeight:"700"}},r.name),
+          h("div",{style:{display:"flex",gap:"6px"}},
+            h("span",{cls:"badge bg-blue"},count+" خروف"),
+            pregCount>0?h("span",{cls:"badge bg-purple"},pregCount+" حامل"):h("span",{})
+          )
+        )
+      ));
+    });
+  }
+
+  return w;
+}
+
+// ─── MODALS ───
+function rModal(){
+  var m=S.modal;
+  var ov=h("div",{cls:"modal-overlay",onClick:function(e){if(e.target===ov)set({modal:null});}});
+  var box=h("div",{cls:"modal"});
+  ov.appendChild(box);
+  if(m.type==="addMother"||m.type==="editMother") buildMotherForm(box,m);
+  else if(m.type==="addChild"||m.type==="editChild") buildChildForm(box,m);
+  else if(m.type==="pregnant") buildPregnantForm(box,m);
+  else if(m.type==="addRam"||m.type==="editRam") buildRamForm(box,m);
+  return ov;
+}
+
+function mTitle(box,title){
+  box.appendChild(h("div",{cls:"modal-title"},title,
+    h("button",{cls:"close-btn",onClick:()=>set({modal:null})},"×")
+  ));
+}
+
+// نموذج النعجة
+function buildMotherForm(box,m){
+  var isEdit=m.type==="editMother";
+  var existing=isEdit?S.mothers[m.mid]:{};
+  mTitle(box,isEdit?"✏️ تعديل النعجة":"🐑 إضافة نعجة جديدة");
+  var fName=h("input",{type:"text",placeholder:"اسم النعجة *",value:existing.name||""});
+  var fNum=h("input",{type:"text",placeholder:"الرقم *",value:existing.number||""});
+  var fDate=h("input",{type:"date",value:existing.birthDate||""});
+  var fNotes=h("textarea",{placeholder:"ملاحظات...",rows:"2"},existing.notes||"");
+  [["الاسم *",fName],["الرقم *",fNum],["تاريخ الميلاد",fDate],["ملاحظات",fNotes]].forEach(([l,el])=>{
+    box.appendChild(h("div",{cls:"field-lbl"},l));
+    box.appendChild(el);
+  });
+  box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+    if(!fName.value.trim()||!fNum.value.trim()){alert("يرجى إدخال الاسم والرقم");return;}
+    var id=isEdit?m.mid:uid();
+    var data={...(existing||{}),id,name:fName.value.trim(),number:fNum.value.trim(),birthDate:fDate.value,notes:fNotes.value.trim(),children:existing.children||[]};
+    await saveMother(data);
+    set({modal:null,expanded:{...S.expanded,[id]:true}});
+  }},isEdit?"💾 حفظ التعديل":"✅ إضافة"));
+}
+
+// نموذج الخروف
+function buildChildForm(box,m){
+  var isEdit=m.type==="editChild";
+  var mother=S.mothers[m.mid]||{};
+  var existing=isEdit?(mother.children||[])[m.ci]:{};
+  mTitle(box,isEdit?"✏️ تعديل الخروف":"+ إضافة خروف");
+  box.appendChild(h("div",{style:{color:"var(--muted)",fontSize:"13px",marginBottom:"12px"}},"الأم: "+mother.name));
+
+  var fName=h("input",{type:"text",placeholder:"اسم الخروف (اختياري)",value:existing.name||""});
+  var fNum=h("input",{type:"text",placeholder:"الرقم (اختياري)",value:existing.number||""});
+  var fGender=h("select",{},h("option",{value:"ذكر"},"🐏 ذكر"),h("option",{value:"أنثى"},"🐑 أنثى"));
+  if(existing.gender)fGender.value=existing.gender;
+
+  var fFather=h("select",{});
+  fFather.appendChild(h("option",{value:""},"— اختر الأب —"));
+  Object.values(S.rams).sort((a,b)=>parseInt(a.number||0)-parseInt(b.number||0)).forEach(r=>{
+    fFather.appendChild(h("option",{value:r.name},r.name+" ("+r.number+")"));
+  });
+  var fFatherManual=h("input",{type:"text",placeholder:"أو اكتب اسم الأب يدوياً",value:""});
+  if(existing.father){
+    fFather.value=existing.father;
+    if(!fFather.value)fFatherManual.value=existing.father;
+  }
+
+  var fDate=h("input",{type:"date",value:existing.birthDate||""});
+  var fNotes=h("textarea",{placeholder:"ملاحظات...",rows:"2"},existing.notes||"");
+
+  [["الاسم",fName],["الرقم",fNum],["الجنس",fGender],["الأب (من القائمة)",fFather],["أو اكتب اسم الأب",fFatherManual],["تاريخ الميلاد",fDate],["ملاحظات",fNotes]].forEach(([l,el])=>{
+    box.appendChild(h("div",{cls:"field-lbl"},l));
+    box.appendChild(el);
+  });
+
+  box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+    var fatherName=fFather.value||fFatherManual.value.trim();
+    var child={name:fName.value.trim(),number:fNum.value.trim(),gender:fGender.value,father:fatherName,birthDate:fDate.value,notes:fNotes.value.trim()};
+    var children=[...(mother.children||[])];
+    if(isEdit)children[m.ci]=child;
+    else children.push(child);
+    var updatedMother={...mother,children};
+    if(m.fromPregnant){
+      updatedMother.pregnant=false;
+      updatedMother.pregnantFather="";
+      updatedMother.pregnantDate="";
+      updatedMother.pregnantNotes="";
+    }
+    await saveMother(updatedMother);
+    set({modal:null});
+  }},isEdit?"💾 حفظ":"✅ إضافة الخروف"));
+}
+
+// نموذج الحمل
+function buildPregnantForm(box,m){
+  var mother=S.mothers[m.mid]||{};
+  var isPreg=mother.pregnant;
+  mTitle(box,"🤰 "+(isPreg?"تعديل الحمل":"تسجيل حمل"));
+  box.appendChild(h("div",{style:{color:"var(--muted)",fontSize:"13px",marginBottom:"12px"}},"النعجة: "+mother.name));
+
+  var fFather=h("select",{});
+  fFather.appendChild(h("option",{value:""},"— اختر الأب —"));
+  Object.values(S.rams).sort((a,b)=>parseInt(a.number||0)-parseInt(b.number||0)).forEach(r=>{
+    fFather.appendChild(h("option",{value:r.name},r.name+" ("+r.number+")"));
+  });
+  var fFatherManual=h("input",{type:"text",placeholder:"أو اكتب اسم الأب يدوياً"});
+  if(mother.pregnantFather){
+    fFather.value=mother.pregnantFather;
+    if(!fFather.value)fFatherManual.value=mother.pregnantFather;
+  }
+  var fDate=h("input",{type:"date",value:mother.pregnantDate||today()});
+  var fNotes=h("textarea",{placeholder:"ملاحظات الحمل...",rows:"2"},mother.pregnantNotes||"");
+
+  [["أب الجنين (من القائمة)",fFather],["أو اكتب اسم الأب",fFatherManual],["تاريخ التلقيح",fDate],["ملاحظات",fNotes]].forEach(([l,el])=>{
+    box.appendChild(h("div",{cls:"field-lbl"},l));
+    box.appendChild(el);
+  });
+
+  box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+    var fatherName=fFather.value||fFatherManual.value.trim();
+    await saveMother({...mother,pregnant:true,pregnantFather:fatherName,pregnantDate:fDate.value,pregnantNotes:fNotes.value.trim()});
+    set({modal:null});
+  }},"✅ حفظ الحمل"));
+
+  if(isPreg){
+    box.appendChild(h("div",{cls:"divider"}));
+    box.appendChild(h("button",{cls:"btn btn-blue",onClick:async()=>{
+      set({modal:{type:"addChild",mid:m.mid,fromPregnant:true}});
+    }},"🐑 تحويل الحمل لمولود"));
+    box.appendChild(h("button",{cls:"btn btn-red",onClick:async()=>{
+      if(!confirm("إلغاء تسجيل الحمل؟"))return;
+      await saveMother({...mother,pregnant:false,pregnantFather:"",pregnantDate:"",pregnantNotes:""});
+      set({modal:null});
+    }},"❌ إلغاء الحمل"));
+  }
+}
+
+// نموذج الكبش
+function buildRamForm(box,m){
+  var isEdit=m.type==="editRam";
+  var existing=isEdit?S.rams[m.rid]:{};
+  mTitle(box,isEdit?"✏️ تعديل الكبش":"🐏 إضافة كبش جديد");
+  var fName=h("input",{type:"text",placeholder:"اسم الكبش *",value:existing.name||""});
+  var fNum=h("input",{type:"text",placeholder:"الرقم *",value:existing.number||""});
+  var fDate=h("input",{type:"date",value:existing.birthDate||""});
+  var fNotes=h("textarea",{placeholder:"ملاحظات...",rows:"2"},existing.notes||"");
+  [["الاسم *",fName],["الرقم *",fNum],["تاريخ الميلاد",fDate],["ملاحظات",fNotes]].forEach(([l,el])=>{
+    box.appendChild(h("div",{cls:"field-lbl"},l));
+    box.appendChild(el);
+  });
+  box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+    if(!fName.value.trim()||!fNum.value.trim()){alert("يرجى إدخال الاسم والرقم");return;}
+    var id=isEdit?m.rid:uid();
+    await saveRam({id,name:fName.value.trim(),number:fNum.value.trim(),birthDate:fDate.value,notes:fNotes.value.trim()});
+    set({modal:null});
+  }},isEdit?"💾 حفظ":"✅ إضافة"));
+}
+
+loadData();
+</script>
+</body>
+</html>
