@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>إدارة الغنم</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0a;--card:#161616;--border:#2a2a2a;--text:#f5f5f5;--muted:#888;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--blue:#60a5fa;--orange:#fb923c;--purple:#a78bfa}
+html,body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh}
+#app{max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#111;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:16px;font-weight:800}
+.tabs{display:flex;overflow-x:auto;background:#111;border-bottom:1px solid var(--border);scrollbar-width:none;position:sticky;top:49px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;padding:10px 6px;font-size:13px;font-family:'Tajawal',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;text-align:center}
+.tab.active{color:#fff;border-bottom-color:#fff;font-weight:700}
+.content{flex:1;padding:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.lbl{color:var(--muted);font-size:13px}
+.val{font-size:14px;font-weight:600}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.bg-green{background:#14532d;color:var(--green)}
+.bg-blue{background:#0c1a2e;color:var(--blue)}
+.bg-yellow{background:#451a03;color:var(--yellow)}
+.bg-red{background:#450a0a;color:var(--red)}
+.bg-purple{background:#2e1065;color:var(--purple)}
+.bg-orange{background:#431407;color:var(--orange)}
+.bg-gray{background:#1f2937;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border-radius:8px;border:none;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-green{background:#166534;color:#fff}
+.btn-red{background:#7f1d1d;color:#fff}
+.btn-gray{background:#374151;color:#fff}
+.btn-blue{background:#1e3a5f;color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px;width:auto;margin-bottom:0}
+.btn-xs{padding:3px 8px;font-size:11px;width:auto;margin-bottom:0;border-radius:6px}
+input,select,textarea{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;padding:10px 12px;width:100%;outline:none;margin-bottom:10px}
+input:focus,select:focus,textarea:focus{border-color:#555}
+textarea{resize:vertical;min-height:60px}
+.field-lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:#0f0f0f;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-box .num{font-size:22px;font-weight:800}
+.stat-box .lbl2{font-size:11px;color:var(--muted);margin-top:3px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:20px;max-height:92vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.close-btn{background:none;border:none;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+.empty{text-align:center;color:var(--muted);padding:40px;font-size:15px;white-space:pre-line}
+.mother-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.mother-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#1a1a1a}
+.mother-body{padding:12px 14px;border-top:1px solid var(--border)}
+.child-item{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:7px}
+.child-item:last-child{margin-bottom:0}
+select option{background:#161616}
+.search-bar{background:#0f0f0f;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:14px;padding:9px 12px;width:100%;outline:none;margin-bottom:12px}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.alert-box{background:#2e1065;border:1px solid #7c3aed;border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.alert-box.due{background:#450a0a;border-color:#dc2626}
+.alert-title{font-weight:800;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.alert-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
+.alert-item:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyA4zxC4MViCtL3m-tIV5jkFWiovArPQ7tg",
+  authDomain:"sheep-fee76.firebaseapp.com",
+  projectId:"sheep-fee76",
+  storageBucket:"sheep-fee76.firebasestorage.app",
+  messagingSenderId:"209017376146",
+  appId:"1:209017376146:web:e449c47bf0da0451ef054b"
+});
+var db=firebase.firestore();
+
+// ─── STATE ───
+var S={tab:"home",modal:null,mothers:{},births:{},expanded:{},motherTypeFilter:"هوش",reportMonth:"all",birthsMonthFilter:"all"};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,4);}
+function fd(s){if(!s)return"—";var d=new Date(s);return isNaN(d)?"—":d.toLocaleDateString("en-GB");}
+function today(){return new Date().toISOString().split("T")[0];}
+function addDays(dateStr,n){var d=new Date(dateStr);if(isNaN(d))return"";d.setDate(d.getDate()+n);return d.toISOString().split("T")[0];}
+function daysBetween(a,b){var d1=new Date(a),d2=new Date(b);if(isNaN(d1)||isNaN(d2))return null;return Math.round((d2-d1)/86400000);}
+var MONTH_NAMES=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+function dateToMonthKey(dateStr){
+  var d=new Date(dateStr);
+  if(isNaN(d))return null;
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+}
+function monthKeyLabel(key){
+  var parts=key.split("-");
+  var y=parts[0],mo=parseInt(parts[1]);
+  return MONTH_NAMES[mo-1]+" "+y;
+}
+
+// ─── FIRESTORE ───
+async function loadData(){
+  try{
+    var ms=await db.collection("sheep_mothers").get();
+    ms.forEach(d=>{S.mothers[d.id]=d.data();});
+    var bs=await db.collection("sheep_births").get();
+    bs.forEach(d=>{S.births[d.id]=d.data();});
+  }catch(e){console.warn(e);}
+  render();
+}
+
+async function saveMother(m){S.mothers[m.id]=m;try{await db.collection("sheep_mothers").doc(m.id).set(m);}catch(e){}render();}
+async function deleteMother(id){
+  var num=S.mothers[id]?S.mothers[id].number:null;
+  var typ=S.mothers[id]?S.mothers[id].motherType:null;
+  delete S.mothers[id];
+  try{await db.collection("sheep_mothers").doc(id).delete();}catch(e){}
+  // حذف المواليد المرتبطة بهذه الأم أيضاً (نفس الرقم ونفس النوع)
+  var toDelete=Object.keys(S.births).filter(bid=>S.births[bid].motherNumber===num&&S.births[bid].motherType===typ);
+  for(var bid of toDelete){
+    delete S.births[bid];
+    try{await db.collection("sheep_births").doc(bid).delete();}catch(e){}
+  }
+  render();
+}
+async function saveBirth(b){S.births[b.id]=b;try{await db.collection("sheep_births").doc(b.id).set(b);}catch(e){}render();}
+async function deleteBirth(id){delete S.births[id];try{await db.collection("sheep_births").doc(id).delete();}catch(e){}render();}
+
+// ─── RENDER ───
+function h(tag,props){
+  var el=document.createElement(tag);
+  if(props)Object.entries(props).forEach(([k,v])=>{
+    if(k==="cls")el.className=v;
+    else if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
+    else if(k[0]==="o"&&k[1]==="n")el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="html")el.innerHTML=v;
+    else el.setAttribute(k,v);
+  });
+  for(var i=2;i<arguments.length;i++){
+    var c=arguments[i];
+    if(c==null)continue;
+    if(Array.isArray(c)){c.forEach(x=>{if(x!=null)el.appendChild(typeof x==="string"?document.createTextNode(x):x);});}
+    else el.appendChild(typeof c==="string"||typeof c==="number"?document.createTextNode(String(c)):c);
+  }
+  return el;
+}
+function set(p){Object.assign(S,p);render();}
+
+function render(){
+  var app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(rTopbar());
+  app.appendChild(rTabs());
+  var c=h("div",{cls:"content"});
+  c.appendChild(rPage());
+  app.appendChild(c);
+  if(S.modal)app.appendChild(rModal());
+}
+
+function rTopbar(){
+  var btns={mothers:"+ أم",births:"+ مولود"};
+  var actions={
+    mothers:()=>set({modal:{type:"addMother"}}),
+    births:()=>set({modal:{type:"addBirth"}}),
+  };
+  return h("div",{cls:"topbar"},
+    h("div",{cls:"topbar-title"},"🐑 إدارة الغنم"),
+    actions[S.tab]?h("button",{cls:"btn btn-green btn-sm",onClick:actions[S.tab]},btns[S.tab]):h("div",{})
+  );
+}
+
+function rTabs(){
+  var bar=h("div",{cls:"tabs"});
+  [{id:"home",l:"🏠 الرئيسية"},{id:"mothers",l:"🐑 الأمهات"},{id:"births",l:"🍼 المواليد"},{id:"report",l:"📊 التقرير"}]
+    .forEach(t=>bar.appendChild(h("button",{cls:"tab"+(S.tab===t.id?" active":""),onClick:()=>set({tab:t.id,modal:null})},t.l)));
+  return bar;
+}
+
+function rPage(){
+  if(S.tab==="home")return rHome();
+  if(S.tab==="mothers")return rMothers();
+  if(S.tab==="births")return rBirths();
+  if(S.tab==="report")return rReport();
+  return h("div",{cls:"empty"},"قريباً");
+}
+
+// ─── تنبيهات الجرعات (للأم، تُحسب من آخر تاريخ ولادة سجّلتها + 14 يوم) ───
+function getMotherLatestBirthDate(motherNumber,motherType){
+  var sameNumberCount=Object.values(S.mothers).filter(x=>x.number===motherNumber).length;
+  var dates=Object.values(S.births).filter(b=>{
+    if(b.motherNumber!==motherNumber||!b.birthDate)return false;
+    if(b.motherType===motherType)return true;
+    // مولود قديم بدون نوع مخزّن: يُحسب لهذه الأم فقط لو رقمها غير مكرر بين الأنواع
+    if(!b.motherType&&sameNumberCount===1)return true;
+    return false;
+  }).map(b=>b.birthDate);
+  if(!dates.length)return null;
+  return dates.sort().slice(-1)[0]; // أحدث تاريخ
+}
+
+function motherDisplayName(motherNumber,motherType){
+  return motherType?(motherType+" "+motherNumber):("رقم الأم "+motherNumber);
+}
+
+function getVaccineAlerts(){
+  var t=today();
+  var list=[];
+  Object.values(S.mothers).forEach(function(mo){
+    var latestBirth=getMotherLatestBirthDate(mo.number,mo.motherType);
+    if(!latestBirth)return;
+    // لو الأم معطاة جرعة بعد آخر ولادة، تستبعد (إلا لو انضافت ولادة جديدة بعد تاريخ الجرعة)
+    if(mo.vaccineDone&&mo.vaccineDoneForBirth===latestBirth)return;
+    var vdate=addDays(latestBirth,14);
+    var diff=daysBetween(t,vdate); // موجب = باقي أيام، سالب = فات الموعد
+    if(diff===null)return;
+    if(diff<=14){ // نطاق التنبيه: كل المتأخر + القادم خلال أسبوعين
+      list.push({mother:mo,latestBirth:latestBirth,vdate:vdate,diff:diff});
+    }
+  });
+  list.sort((a,b)=>a.diff-b.diff);
+  return list;
+}
+
+function rAlertBanner(){
+  var alerts=getVaccineAlerts();
+  if(!alerts.length)return null;
+  var hasDue=alerts.some(a=>a.diff<=0);
+  var box=h("div",{cls:"alert-box"+(hasDue?" due":"")});
+  box.appendChild(h("div",{cls:"alert-title"},"💉 تنبيه جرعات الأمهات (بعد 14 يوم من الولادة)"));
+  alerts.slice(0,8).forEach(function(a){
+    var statusTxt=a.diff>0?("باقي "+a.diff+" يوم"):a.diff===0?"اليوم":("متأخر "+(-a.diff)+" يوم");
+    var badgeCls=a.diff>0?"badge bg-yellow":a.diff===0?"badge bg-orange":"badge bg-red";
+    box.appendChild(h("div",{cls:"alert-item"},
+      h("span",{},motherDisplayName(a.mother.number,a.mother.motherType)+" • "+fd(a.vdate)),
+      h("span",{cls:badgeCls},statusTxt)
+    ));
+  });
+  return box;
+}
+
+// ─── الرئيسية (تنبيهات فقط) ───
+function rHome(){
+  var w=h("div",{});
+  var alerts=getVaccineAlerts();
+  if(!alerts.length){
+    w.appendChild(h("div",{cls:"empty"},"✅\nلا توجد تنبيهات حالياً\nراح تظهر هنا جرعات الأمهات المتأخرة أو القادمة خلال أسبوعين"));
+    return w;
+  }
+  w.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",marginBottom:"10px",color:"var(--muted)"}},"💉 تنبيهات جرعات الأمهات (بعد 14 يوم من الولادة)"));
+  alerts.forEach(function(a){
+    var mo=a.mother;
+    var statusTxt=a.diff>0?("باقي "+a.diff+" يوم"):a.diff===0?"اليوم":("متأخر "+(-a.diff)+" يوم");
+    var badgeCls=a.diff>0?"badge bg-yellow":a.diff===0?"badge bg-orange":"badge bg-red";
+    var card=h("div",{cls:"card",style:{borderColor:a.diff<=0?"#dc2626":"var(--border)"}});
+    card.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}},
+      h("div",{style:{fontWeight:"800",fontSize:"14px"}},motherDisplayName(mo.number,mo.motherType)),
+      h("span",{cls:badgeCls},statusTxt)
+    ));
+    card.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"آخر تاريخ ولادة"),h("span",{style:{fontSize:"13px"}},fd(a.latestBirth))));
+    card.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"موعد الجرعة"),h("span",{style:{fontSize:"13px"}},fd(a.vdate))));
+    card.appendChild(h("button",{cls:"btn btn-green btn-sm",style:{width:"100%",marginTop:"8px"},onClick:async()=>{
+      await saveMother({...mo,vaccineDone:true,vaccineDoneForBirth:a.latestBirth,vaccineDoneDate:today()});
+    }},"✅ تم إعطاء الجرعة"));
+    w.appendChild(card);
+  });
+  return w;
+}
+
+// ─── الأمهات ───
+function rMothers(){
+  var w=h("div",{});
+  var mothers=Object.values(S.mothers).sort((a,b)=>parseInt(a.number)-parseInt(b.number));
+
+  var typeFilter=S.motherTypeFilter||"هوش";
+  var typBar=h("div",{style:{display:"flex",gap:"6px",marginBottom:"12px"}});
+  ["هوش","يعد"].forEach(function(t){
+    typBar.appendChild(h("button",{
+      cls:"btn btn-sm",
+      style:{background:typeFilter===t?"#fff":"#1f2937",color:typeFilter===t?"#000":"#fff",flex:"1"},
+      onClick:()=>set({motherTypeFilter:t})
+    },t));
+  });
+  w.appendChild(typBar);
+
+  if(!mothers.length){
+    w.appendChild(h("div",{cls:"empty"},"🐑\nلا توجد أمهات بعد\nاضغط + أم لإضافة أول رقم أم"));
+    return w;
+  }
+
+  var filtered=mothers.filter(m=>(m.motherType||"هوش")===typeFilter);
+
+  var si=h("input",{cls:"search-bar",type:"text",placeholder:"🔍 بحث برقم الأم..."});
+  w.appendChild(si);
+
+  var list=h("div",{});
+  function renderList(q){
+    list.innerHTML="";
+    var f=q?filtered.filter(m=>(m.number+"").includes(q)):filtered;
+    if(!f.length){list.appendChild(h("div",{cls:"empty"},"لا توجد نتائج"));return;}
+    f.forEach(m=>list.appendChild(buildMotherCard(m)));
+  }
+  si.addEventListener("input",e=>renderList(e.target.value.trim()));
+  renderList("");
+  w.appendChild(list);
+  return w;
+}
+
+function buildMotherCard(m){
+  var sameNumberMothers=Object.values(S.mothers).filter(x=>x.number===m.number);
+  var births=Object.values(S.births).filter(b=>{
+    if(b.motherNumber!==m.number)return false;
+    if(b.motherType===m.motherType)return true;
+    // مولود قديم بدون نوع مخزّن: يُنسب لهذه الأم فقط لو رقمها غير مكرر بين الأنواع
+    if(!b.motherType&&sameNumberMothers.length===1)return true;
+    return false;
+  });
+  var expanded=S.expanded[m.id];
+
+  var card=h("div",{cls:"mother-card"});
+
+  var hdr=h("div",{cls:"mother-header",onClick:()=>{
+    var ex={...S.expanded};
+    ex[m.id]=!ex[m.id];
+    set({expanded:ex});
+  }});
+
+  var hRight=h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}});
+  hRight.appendChild(h("span",{style:{fontSize:"22px"}},"🐑"));
+  var hInfo=h("div",{});
+  hInfo.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px"}},(m.motherType?m.motherType+" ":"رقم الأم: ")+m.number));
+  var badgeRow=h("div",{style:{display:"flex",gap:"6px",marginTop:"4px",alignItems:"center"}});
+  badgeRow.appendChild(h("span",{cls:"badge "+((m.motherType||"هوش")==="هوش"?"bg-gray":"bg-purple")},m.motherType||"هوش"));
+  if(births.length>0){
+    badgeRow.appendChild(h("span",{cls:"badge bg-orange"},births.length+" مولود"));
+  }
+  hInfo.appendChild(badgeRow);
+  hRight.appendChild(hInfo);
+
+  hdr.appendChild(h("span",{style:{color:"var(--muted)",fontSize:"18px"}},expanded?"▲":"▼"));
+  hdr.appendChild(hRight);
+  card.appendChild(hdr);
+
+  if(!expanded){return card;}
+
+  var body=h("div",{cls:"mother-body"});
+
+  if(m.notes){
+    body.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",marginBottom:"8px"}},m.notes));
+  }
+
+  // حالة جرعة الأم (بعد 14 يوم من آخر ولادة)
+  var latestBirth=getMotherLatestBirthDate(m.number,m.motherType);
+  if(latestBirth){
+    var vdate=addDays(latestBirth,14);
+    var isVaccinated=m.vaccineDone&&m.vaccineDoneForBirth===latestBirth;
+    var vBox=h("div",{style:{background:"#0f0f0f",border:"1px solid var(--border)",borderRadius:"8px",padding:"10px 12px",marginBottom:"10px"}});
+    vBox.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"موعد جرعة الأم"),h("span",{style:{fontSize:"13px"}},fd(vdate))));
+    vBox.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"حالة الجرعة"),
+      isVaccinated?h("span",{cls:"badge bg-green"},"✅ تمّ التطعيم"):h("span",{cls:"badge bg-gray"},"لم تُعطَ بعد")
+    ));
+    if(!isVaccinated){
+      vBox.appendChild(h("button",{cls:"btn btn-green btn-sm",style:{width:"100%",marginTop:"8px"},onClick:async()=>{
+        await saveMother({...m,vaccineDone:true,vaccineDoneForBirth:latestBirth,vaccineDoneDate:today()});
+      }},"✅ تم إعطاء الجرعة"));
+    }
+    body.appendChild(vBox);
+  }
+
+  // المواليد المرتبطة بهذه الأم
+  if(births.length){
+    body.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",marginBottom:"6px",fontWeight:"700"}},"المواليد ("+births.length+")"));
+    births.forEach(function(b){
+      var chCard=h("div",{cls:"child-item"});
+      var chTop=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}});
+      chTop.appendChild(h("div",{style:{fontWeight:"700",fontSize:"13px"}},"🍼 "+fd(b.birthDate)));
+      chTop.appendChild(h("span",{cls:"badge "+(b.gender==="ذكر"?"bg-blue":"bg-green")},b.gender||"—"));
+      chCard.appendChild(chTop);
+      if(b.notes)chCard.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted)",marginTop:"4px"}},b.notes));
+      body.appendChild(chCard);
+    });
+  }
+
+  body.appendChild(h("div",{cls:"divider"}));
+  body.appendChild(h("div",{style:{display:"flex",gap:"6px",flexWrap:"wrap"}},
+    h("button",{cls:"btn btn-blue btn-sm",onClick:()=>set({modal:{type:"addBirth",motherNumber:m.number,motherType:m.motherType}})},"+ إضافة مولود"),
+    h("button",{cls:"btn btn-gray btn-sm",onClick:()=>set({modal:{type:"editMother",mid:m.id}})},"✏️ تعديل"),
+    h("button",{cls:"btn btn-red btn-sm",onClick:async()=>{
+      if(!confirm("حذف الأم رقم '"+m.number+"' وجميع مواليدها؟"))return;
+      await deleteMother(m.id);
+    }},"🗑 حذف")
+  ));
+
+  card.appendChild(body);
+  return card;
+}
+
+// ─── المواليد ───
+function rBirths(){
+  var w=h("div",{});
+  var banner=rAlertBanner();
+  if(banner)w.appendChild(banner);
+
+  var births=Object.values(S.births).sort((a,b)=>(b.birthDate||"").localeCompare(a.birthDate||""));
+
+  if(!births.length){
+    w.appendChild(h("div",{cls:"empty"},"🍼\nلا توجد مواليد بعد\nاضغط + مولود لإضافة أول مولود"));
+    return w;
+  }
+
+  // بناء قائمة الأشهر المتوفرة من تواريخ الولادة الفعلية
+  var monthSet={};
+  births.forEach(function(b){
+    var key=dateToMonthKey(b.birthDate);
+    if(key)monthSet[key]=true;
+  });
+  var curKey=dateToMonthKey(today());
+  monthSet[curKey]=true;
+  var monthKeys=Object.keys(monthSet).sort().reverse();
+  var selectedMonth=S.birthsMonthFilter||"all";
+
+  var monthBar=h("div",{style:{display:"flex",gap:"6px",marginBottom:"12px"}});
+  var fMonthSel=h("select",{style:{marginBottom:"0",flex:"1"}});
+  fMonthSel.appendChild(h("option",{value:"all"},"كل الفترة"));
+  monthKeys.forEach(function(key){
+    fMonthSel.appendChild(h("option",{value:key},monthKeyLabel(key)));
+  });
+  fMonthSel.value=selectedMonth;
+  fMonthSel.addEventListener("change",function(){set({birthsMonthFilter:fMonthSel.value});});
+  monthBar.appendChild(fMonthSel);
+  w.appendChild(monthBar);
+
+  var si=h("input",{cls:"search-bar",type:"text",placeholder:"🔍 بحث برقم الأم..."});
+  w.appendChild(si);
+
+  // تجميع المواليد حسب رقم الأم + نوعها (هوش 1 وياعد 1 يفترقون)
+  var groupMap={};
+  births.forEach(function(b){
+    var key=b.motherNumber+"|"+(b.motherType||"");
+    if(!groupMap[key])groupMap[key]={motherNumber:b.motherNumber,motherType:b.motherType,items:[]};
+    groupMap[key].items.push(b);
+  });
+  var allGroups=Object.values(groupMap).sort((a,b)=>(a.motherNumber+"").localeCompare(b.motherNumber+"",undefined,{numeric:true}));
+
+  // لو فيه فلتر شهر، نستبعد الأمهات اللي ما عندها أي مولود بذاك الشهر
+  var groups=selectedMonth==="all"?allGroups:allGroups.filter(function(g){
+    return g.items.some(b=>dateToMonthKey(b.birthDate)===selectedMonth);
+  });
+
+  var list=h("div",{});
+  function renderList(q){
+    list.innerHTML="";
+    var f=q?groups.filter(g=>(g.motherNumber+"").includes(q)):groups;
+    if(!f.length){list.appendChild(h("div",{cls:"empty"},"لا توجد نتائج"));return;}
+    f.forEach(g=>list.appendChild(buildBirthGroupCard(g,selectedMonth)));
+  }
+  si.addEventListener("input",e=>renderList(e.target.value.trim()));
+  renderList("");
+  w.appendChild(list);
+  return w;
+}
+
+function buildBirthGroupCard(g,selectedMonth){
+  var mo=Object.values(S.mothers).find(x=>x.number===g.motherNumber&&x.motherType===g.motherType);
+  if(!mo){
+    var candidates=Object.values(S.mothers).filter(x=>x.number===g.motherNumber);
+    if(candidates.length===1)mo=candidates[0];
+  }
+  var expKey="birth_"+g.motherNumber+"_"+(g.motherType||"");
+  var expanded=S.expanded[expKey]!==undefined?S.expanded[expKey]:true;
+
+  // المواليد المعروضة تحت البطاقة: كلهم إذا "كل الفترة"، أو فقط مواليد الشهر المختار
+  var visibleItems=(!selectedMonth||selectedMonth==="all")?g.items:g.items.filter(b=>dateToMonthKey(b.birthDate)===selectedMonth);
+
+  var card=h("div",{cls:"mother-card"});
+
+  var hdr=h("div",{cls:"mother-header",onClick:()=>{
+    var ex={...S.expanded};
+    ex[expKey]=!expanded;
+    set({expanded:ex});
+  }});
+
+  var hRight=h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}});
+  hRight.appendChild(h("span",{style:{fontSize:"22px"}},"🍼"));
+  var hInfo=h("div",{});
+  hInfo.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px"}},(mo&&mo.motherType?mo.motherType+" ":"رقم الأم: ")+g.motherNumber));
+  var badgeRow=h("div",{style:{display:"flex",gap:"6px",marginTop:"4px",alignItems:"center"}});
+  badgeRow.appendChild(h("span",{cls:"badge bg-orange"},visibleItems.length+(selectedMonth&&selectedMonth!=="all"?" مولود هالشهر":" مولود")));
+  hInfo.appendChild(badgeRow);
+  hRight.appendChild(hInfo);
+
+  hdr.appendChild(h("span",{style:{color:"var(--muted)",fontSize:"18px"}},expanded?"▲":"▼"));
+  hdr.appendChild(hRight);
+  card.appendChild(hdr);
+
+  if(!expanded){return card;}
+
+  var body=h("div",{cls:"mother-body"});
+
+  // حالة جرعة الأم
+  if(mo){
+    var latestBirth=getMotherLatestBirthDate(g.motherNumber,mo.motherType);
+    var isVaccinated=mo.vaccineDone&&mo.vaccineDoneForBirth===latestBirth;
+    var vBox=h("div",{style:{background:"#0f0f0f",border:"1px solid var(--border)",borderRadius:"8px",padding:"10px 12px",marginBottom:"10px"}});
+    vBox.appendChild(h("div",{cls:"row"},h("span",{cls:"lbl"},"حالة جرعة الأم"),
+      isVaccinated?h("span",{cls:"badge bg-green"},"✅ تمّ التطعيم"):h("span",{cls:"badge bg-gray"},"لم تُعطَ بعد")
+    ));
+    body.appendChild(vBox);
+  }
+
+  // المواليد (مفلترة حسب الشهر المختار إن وجد)
+  var sortedItems=visibleItems.slice().sort((a,b)=>(b.birthDate||"").localeCompare(a.birthDate||""));
+  if(!sortedItems.length){
+    body.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted)",padding:"8px 0"}},"لا توجد مواليد لهذه الأم في الشهر المختار"));
+  }
+  sortedItems.forEach(function(b){
+    var chCard=h("div",{cls:"child-item"});
+    var chTop=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}});
+    chTop.appendChild(h("div",{style:{fontWeight:"700",fontSize:"13px"}},"🍼 "+fd(b.birthDate)));
+    chTop.appendChild(h("span",{cls:"badge "+(b.gender==="ذكر"?"bg-blue":"bg-green")},b.gender||"—"));
+    chCard.appendChild(chTop);
+    if(b.notes)chCard.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted)",marginTop:"4px"}},b.notes));
+    chCard.appendChild(h("div",{style:{display:"flex",gap:"6px",marginTop:"8px"}},
+      h("button",{cls:"btn btn-gray btn-xs",onClick:()=>set({modal:{type:"editBirth",bid:b.id}})},"✏️ تعديل"),
+      h("button",{cls:"btn btn-red btn-xs",onClick:async()=>{
+        if(!confirm("حذف هذا المولود؟"))return;
+        await deleteBirth(b.id);
+      }},"🗑 حذف")
+    ));
+    body.appendChild(chCard);
+  });
+
+  body.appendChild(h("div",{cls:"divider"}));
+  body.appendChild(h("button",{cls:"btn btn-blue btn-sm",onClick:()=>set({modal:{type:"addBirth",motherNumber:g.motherNumber,motherType:g.motherType}})},"+ إضافة مولود لنفس الأم"));
+
+  card.appendChild(body);
+  return card;
+}
+
+// ─── التقرير ───
+function rReport(){
+  var w=h("div",{});
+  var mothers=Object.values(S.mothers);
+  var allBirths=Object.values(S.births);
+
+  var monthNames=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+  // بناء قائمة الأشهر المتوفرة من تواريخ الولادة الفعلية
+  var monthSet={};
+  allBirths.forEach(function(b){
+    if(!b.birthDate)return;
+    var d=new Date(b.birthDate);
+    if(isNaN(d))return;
+    var key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    monthSet[key]=true;
+  });
+  var now=new Date();
+  var curKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+  monthSet[curKey]=true; // تأكد أن الشهر الحالي موجود دايماً كخيار
+  var monthKeys=Object.keys(monthSet).sort().reverse();
+
+  function monthLabel(key){
+    var parts=key.split("-");
+    var y=parts[0],mo=parseInt(parts[1]);
+    return monthNames[mo-1]+" "+y;
+  }
+
+  var selectedMonth=S.reportMonth||"all";
+
+  var monthBar=h("div",{style:{display:"flex",gap:"6px",marginBottom:"12px"}});
+  var fMonthSel=h("select",{style:{marginBottom:"0",flex:"1"}});
+  fMonthSel.appendChild(h("option",{value:"all"},"كل الفترة"));
+  monthKeys.forEach(function(key){
+    fMonthSel.appendChild(h("option",{value:key},monthLabel(key)));
+  });
+  fMonthSel.value=selectedMonth;
+  fMonthSel.addEventListener("change",function(){set({reportMonth:fMonthSel.value});});
+  monthBar.appendChild(fMonthSel);
+  w.appendChild(monthBar);
+
+  var births=selectedMonth==="all"?allBirths:allBirths.filter(function(b){
+    if(!b.birthDate)return false;
+    var d=new Date(b.birthDate);
+    if(isNaN(d))return false;
+    var key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    return key===selectedMonth;
+  });
+
+  var males=births.filter(b=>b.gender==="ذكر").length;
+  var females=births.filter(b=>b.gender==="أنثى").length;
+
+  var grid=h("div",{cls:"stat-grid"});
+  [
+    [String(selectedMonth==="all"?mothers.length:new Set(births.map(b=>b.motherNumber)).size),selectedMonth==="all"?"إجمالي الأمهات":"أمهات وَلدت هالشهر","var(--orange)"],
+    [String(births.length),"إجمالي المواليد","#fff"],
+    [String(males),"مواليد ذكور","var(--blue)"],
+    [String(females),"مواليد إناث","var(--green)"],
+  ].forEach(([n,l,c])=>{
+    grid.appendChild(h("div",{cls:"stat-box"},
+      h("div",{cls:"num",style:{color:c}},n),
+      h("div",{cls:"lbl2"},l)
+    ));
+  });
+  w.appendChild(grid);
+
+  var alerts=getVaccineAlerts();
+  if(alerts.length){
+    w.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",margin:"4px 0 10px",color:"var(--muted)"}},"💉 جرعات قريبة / متأخرة"));
+    var banner=rAlertBanner();
+    if(banner)w.appendChild(banner);
+  }
+
+  // مواليد حسب الموسم (أكتوبر → مارس = موسم الغنم)
+  function getSeason(dateStr){
+    if(!dateStr)return null;
+    var d=new Date(dateStr);
+    if(isNaN(d))return null;
+    var y=d.getFullYear();
+    var mo=d.getMonth()+1;
+    if(mo>=10)return y+"/"+(y+1);
+    if(mo<=3)return(y-1)+"/"+y;
+    return null;
+  }
+  var seasonMap={};
+  allBirths.forEach(function(b){
+    var s=getSeason(b.birthDate);
+    if(!s)return;
+    if(!seasonMap[s])seasonMap[s]={males:0,females:0};
+    if(b.gender==="ذكر")seasonMap[s].males++;
+    else seasonMap[s].females++;
+  });
+  var seasons=Object.keys(seasonMap).sort().reverse();
+  if(seasons.length){
+    w.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",margin:"16px 0 10px",color:"var(--muted)"}},"🐣 مواليد حسب الموسم"));
+    seasons.forEach(function(s){
+      var d=seasonMap[s];
+      var total=d.males+d.females;
+      w.appendChild(h("div",{cls:"card",style:{padding:"12px 14px",marginBottom:"8px"}},
+        h("div",{style:{fontWeight:"800",fontSize:"14px",marginBottom:"8px",color:"#fff"}},"موسم "+s),
+        h("div",{style:{display:"flex",gap:"8px"}},
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px",color:"var(--blue)"}},String(d.males)),h("div",{cls:"lbl2"},"ذكور")),
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px",color:"var(--green)"}},String(d.females)),h("div",{cls:"lbl2"},"إناث")),
+          h("div",{cls:"stat-box",style:{flex:"1"}},h("div",{cls:"num",style:{fontSize:"18px"}},String(total)),h("div",{cls:"lbl2"},"المجموع"))
+        )
+      ));
+    });
+  }
+
+  // زر التقرير
+  var printTitle=selectedMonth==="all"?"كل الفترة":monthLabel(selectedMonth);
+  var printMotherCount=selectedMonth==="all"?mothers.length:new Set(births.map(b=>b.motherNumber)).size;
+  w.appendChild(h("button",{cls:"btn btn-gray",style:{marginTop:"6px"},onClick:function(){
+    var printNow=new Date();
+    var sorted=births.slice().sort((a,b)=>(a.motherNumber+"").localeCompare(b.motherNumber+"",undefined,{numeric:true}));
+    // تجميع المواليد حسب رقم الأم + نوعها (هوش 1 وياعد 1 يفترقون)
+    var groups=[];
+    var groupMap={};
+    sorted.forEach(function(b){
+      var key=b.motherNumber+"|"+(b.motherType||"");
+      if(!groupMap[key]){
+        groupMap[key]={motherNumber:b.motherNumber,motherType:b.motherType,items:[]};
+        groups.push(groupMap[key]);
+      }
+      groupMap[key].items.push(b);
+    });
+    var rows="";
+    groups.forEach(function(g,gi){
+      var mo=Object.values(S.mothers).find(x=>x.number===g.motherNumber&&x.motherType===g.motherType);
+      if(!mo){
+        // توافق مع مواليد قديمة بدون نوع مخزّن: نطابق برقم الأم فقط
+        var candidates=Object.values(S.mothers).filter(x=>x.number===g.motherNumber);
+        if(candidates.length===1)mo=candidates[0];
+      }
+      var motherType=mo?(mo.motherType||"—"):"—";
+      var latestBirth=mo?getMotherLatestBirthDate(g.motherNumber,mo.motherType):null;
+      var vdate=latestBirth?addDays(latestBirth,14):null;
+      var isVaccinated=mo&&mo.vaccineDone&&mo.vaccineDoneForBirth===latestBirth;
+      var vaccineCell=vdate?(fd(vdate)+(isVaccinated?" ✅":" ⏳")):"—";
+      var zebra=gi%2===1?" style='background:#f9f9f9'":"";
+      g.items.forEach(function(b,idx){
+        rows+="<tr"+zebra+">";
+        if(idx===0){
+          rows+="<td rowspan='"+g.items.length+"' style='text-align:center;font-weight:800;vertical-align:middle;border-left:2px solid #999'>"+g.motherNumber+"</td>";
+          rows+="<td rowspan='"+g.items.length+"' style='text-align:center;vertical-align:middle;border-left:2px solid #999'>"+motherType+"</td>";
+        }
+        rows+="<td style='text-align:center'>"+fd(b.birthDate)+"</td>"
+          +"<td style='text-align:center'>"+(b.gender||"—")+"</td>";
+        if(idx===0){
+          rows+="<td rowspan='"+g.items.length+"' style='text-align:center;vertical-align:middle;border-right:2px solid #999'>"+vaccineCell+"</td>";
+        }
+        rows+="<td style='font-size:12px;color:#555'>"+(b.notes||"—")+"</td>"
+          +"</tr>";
+      });
+    });
+    if(!rows){rows="<tr><td colspan='6' style='text-align:center;color:#888;padding:16px'>لا توجد مواليد في هذه الفترة</td></tr>";}
+    var pw=window.open("","_blank");
+    pw.document.write(`<!DOCTYPE html><html dir='rtl'><head><meta charset='UTF-8'>
+    <link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap' rel='stylesheet'>
+    <style>
+      *{box-sizing:border-box}
+      body{font-family:Tajawal,Arial,sans-serif;padding:16px;direction:rtl;font-size:13px;color:#111}
+      h2{text-align:center;font-size:20px;margin-bottom:4px}
+      h3{text-align:center;color:#555;font-size:12px;font-weight:400;margin-bottom:14px}
+      .summary{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+      .sum-box{border:1px solid #ddd;border-radius:6px;padding:8px 14px;text-align:center;min-width:90px}
+      .sum-box .n{font-size:20px;font-weight:800}
+      .sum-box .l{font-size:10px;color:#888;margin-top:2px}
+      table{width:100%;border-collapse:collapse;margin-bottom:16px}
+      th{background:#1a1a1a;color:#fff;padding:7px 10px;font-size:12px;text-align:right}
+      td{border:1px solid #e0e0e0;padding:6px 8px;vertical-align:middle}
+      @media print{button{display:none!important}body{padding:8px}}
+    </style></head><body>
+    <h2>🐑 التقرير — ${printTitle}</h2>
+    <h3>تاريخ الطباعة: ${printNow.toLocaleDateString("en-GB")} | إجمالي الأمهات: ${printMotherCount}</h3>
+    <div class='summary'>
+      <div class='sum-box'><div class='n'>${printMotherCount}</div><div class='l'>إجمالي الأمهات</div></div>
+      <div class='sum-box'><div class='n' style='color:blue'>${males}</div><div class='l'>مواليد ذكور</div></div>
+      <div class='sum-box'><div class='n' style='color:green'>${females}</div><div class='l'>مواليد إناث</div></div>
+      <div class='sum-box'><div class='n'>${births.length}</div><div class='l'>إجمالي المواليد</div></div>
+    </div>
+    <table>
+      <thead><tr><th>رقم الأم</th><th>نوع الأم</th><th>تاريخ الولادة</th><th>الصنف</th><th>جرعة الأم (بعد 14 يوم)</th><th>ملاحظات</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style='text-align:center;margin-top:12px'>
+      <button onclick='window.print()' style='padding:10px 28px;font-size:14px;cursor:pointer;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-family:Tajawal'>🖨️ طباعة</button>
+    </div></body></html>`);
+    pw.document.close();
+  }},"🖨️ طباعة التقرير"));
+
+  return w;
+}
+
+// ─── MODALS ───
+function rModal(){
+  var m=S.modal;
+  var ov=h("div",{cls:"modal-overlay",onClick:function(e){if(e.target===ov)set({modal:null});}});
+  var box=h("div",{cls:"modal"});
+  ov.appendChild(box);
+  if(m.type==="addMother"||m.type==="editMother") buildMotherForm(box,m);
+  else if(m.type==="addBirth"||m.type==="editBirth") buildBirthForm(box,m);
+  return ov;
+}
+
+function mTitle(box,title){
+  box.appendChild(h("div",{cls:"modal-title"},title,
+    h("button",{cls:"close-btn",onClick:()=>set({modal:null})},"×")
+  ));
+}
+
+// نموذج الأم
+function buildMotherForm(box,m){
+  var isEdit=m.type==="editMother";
+  var existing=isEdit?S.mothers[m.mid]:{};
+  mTitle(box,isEdit?"✏️ تعديل الأم":"🐑 إضافة أم جديدة");
+  var fNum=h("input",{type:"text",placeholder:"رقم الأم *",value:existing.number||""});
+  var fType=h("select",{},
+    h("option",{value:""},"— اختر النوع —"),
+    h("option",{value:"هوش"},"هوش"),
+    h("option",{value:"يعد"},"يعد")
+  );
+  if(existing.motherType)fType.value=existing.motherType;
+  var fNotes=h("textarea",{placeholder:"ملاحظات...",rows:"2"},existing.notes||"");
+  [["رقم الأم *",fNum],["النوع *",fType],["ملاحظات",fNotes]].forEach(([l,el])=>{
+    box.appendChild(h("div",{cls:"field-lbl"},l));
+    box.appendChild(el);
+  });
+  box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+    var newNum=fNum.value.trim();
+    if(!newNum){alert("يرجى إدخال رقم الأم");return;}
+    if(!fType.value){alert("يرجى اختيار النوع: هوش أو يعد");return;}
+    // تأكد عدم تكرار الرقم داخل نفس النوع عند الإضافة (يجوز تكرار الرقم بين هوش ويعد)
+    if(!isEdit&&Object.values(S.mothers).some(x=>x.number===newNum&&x.motherType===fType.value)){alert("رقم الأم هذا مضاف مسبقاً ضمن نفس النوع ("+fType.value+")");return;}
+    if(isEdit&&Object.values(S.mothers).some(x=>x.id!==m.mid&&x.number===newNum&&x.motherType===fType.value)){alert("رقم الأم هذا مضاف مسبقاً ضمن نفس النوع ("+fType.value+")");return;}
+    var id=isEdit?m.mid:uid();
+    var oldNum=isEdit?existing.number:null;
+    var oldType=isEdit?existing.motherType:null;
+    var data={...(existing||{}),id,number:newNum,motherType:fType.value,notes:fNotes.value.trim()};
+    await saveMother(data);
+    // لو تغيّر رقم الأم أو نوعها أثناء التعديل، حدّث المواليد المرتبطة بها
+    if(isEdit&&oldNum&&(oldNum!==newNum||oldType!==fType.value)){
+      var linked=Object.values(S.births).filter(b=>b.motherNumber===oldNum&&b.motherType===oldType);
+      for(var b of linked){await saveBirth({...b,motherNumber:newNum,motherType:fType.value});}
+    }
+    set({modal:null,tab:"mothers",motherTypeFilter:fType.value,expanded:{...S.expanded,[id]:true}});
+  }},isEdit?"💾 حفظ التعديل":"✅ إضافة"));
+}
+
+// نموذج المولود
+function buildBirthForm(box,m){
+  var isEdit=m.type==="editBirth";
+  var existing=isEdit?S.births[m.bid]:{};
+  mTitle(box,isEdit?"✏️ تعديل المولود":"🍼 إضافة مولود جديد");
+
+  var fMother=h("select",{});
+  fMother.appendChild(h("option",{value:""},"— اختر رقم الأم —"));
+  Object.values(S.mothers).sort((a,b)=>parseInt(a.number||0)-parseInt(b.number||0)).forEach(mo=>{
+    var optVal=mo.number+"|"+(mo.motherType||"");
+    fMother.appendChild(h("option",{value:optVal},(mo.motherType?mo.motherType+" ":"رقم ")+mo.number));
+  });
+  var presetMother=m.motherNumber||existing.motherNumber||"";
+  var presetType=m.motherType!==undefined?m.motherType:(existing.motherType!==undefined?existing.motherType:"");
+  if(presetMother)fMother.value=presetMother+"|"+(presetType||"");
+
+  var fDate=h("input",{type:"date",value:existing.birthDate||today()});
+  var fNotes=h("textarea",{placeholder:"ملاحظات...",rows:"2"},existing.notes||"");
+
+  if(!Object.values(S.mothers).length){
+    box.appendChild(h("div",{style:{color:"var(--yellow)",fontSize:"12px",marginBottom:"10px"}},"⚠️ لا توجد أمهات مضافة بعد. أضف رقم الأم أولاً من تبويب الأمهات."));
+  }
+
+  box.appendChild(h("div",{cls:"field-lbl"},"رقم الأم *"));
+  box.appendChild(fMother);
+  box.appendChild(h("div",{cls:"field-lbl"},"تاريخ الولادة *"));
+  box.appendChild(fDate);
+
+  var vinfo=h("div",{style:{fontSize:"12px",color:"var(--muted)",marginBottom:"12px"}});
+  function updateVinfo(){
+    var vd=addDays(fDate.value,14);
+    vinfo.textContent=fDate.value?("💉 موعد جرعة الأم المتوقع: "+fd(vd)):"";
+  }
+  fDate.addEventListener("input",updateVinfo);
+  updateVinfo();
+  box.appendChild(vinfo);
+
+  if(isEdit){
+    // وضع التعديل: مولود واحد فقط، نفس الشكل القديم
+    var fGender=h("select",{},h("option",{value:"ذكر"},"🐏 ذكر"),h("option",{value:"أنثى"},"🐑 أنثى"));
+    if(existing.gender)fGender.value=existing.gender;
+    box.appendChild(h("div",{cls:"field-lbl"},"الجنس"));
+    box.appendChild(fGender);
+    box.appendChild(h("div",{cls:"field-lbl"},"ملاحظات"));
+    box.appendChild(fNotes);
+
+    box.appendChild(h("button",{cls:"btn btn-green",onClick:async()=>{
+      if(!fMother.value){alert("يرجى اختيار رقم الأم");return;}
+      if(!fDate.value){alert("يرجى إدخال تاريخ الولادة");return;}
+      var parts=fMother.value.split("|");
+      var selNum=parts[0],selType=parts[1]||"";
+      var data={...existing,id:m.bid,motherNumber:selNum,motherType:selType,birthDate:fDate.value,gender:fGender.value,notes:fNotes.value.trim()};
+      await saveBirth(data);
+      set({modal:null,tab:"births"});
+    }},"💾 حفظ"));
+    return;
+  }
+
+  // وضع الإضافة: اختيار عدد المواليد (توأم/ثلاثة) وتحديد جنس كل واحد
+  box.appendChild(h("div",{cls:"field-lbl"},"عدد المواليد *"));
+  var countBar=h("div",{style:{display:"flex",gap:"6px",marginBottom:"12px"}});
+  var genderFieldsWrap=h("div",{});
+  var selectedCount=1;
+
+  function renderGenderFields(){
+    genderFieldsWrap.innerHTML="";
+    for(var i=0;i<selectedCount;i++){
+      var lbl=selectedCount===1?"الجنس":("جنس المولود "+(i+1));
+      var sel=h("select",{"data-idx":String(i)},h("option",{value:"ذكر"},"🐏 ذكر"),h("option",{value:"أنثى"},"🐑 أنثى"));
+      genderFieldsWrap.appendChild(h("div",{cls:"field-lbl"},lbl));
+      genderFieldsWrap.appendChild(sel);
+    }
+  }
+  [1,2,3].forEach(function(n){
+    countBar.appendChild(h("button",{
+      cls:"btn btn-sm",
+      style:{background:selectedCount===n?"#fff":"#1f2937",color:selectedCount===n?"#000":"#fff",flex:"1"},
+      onClick:function(){
+        selectedCount=n;
+        Array.from(countBar.children).forEach(function(btn,bi){
+          btn.style.background=(bi+1===n)?"#fff":"#1f2937";
+          btn.style.color=(bi+1===n)?"#000":"#fff";
+        });
+        renderGenderFields();
+      }
+    },String(n)));
+  });
+  box.appendChild(countBar);
+  renderGenderFields();
+  box.appendChild(genderFieldsWrap);
+
+  box.appendChild(h("div",{cls:"field-lbl"},"ملاحظات"));
+  box.appendChild(fNotes);
+
+  var addBtn=h("button",{cls:"btn btn-green",onClick:async()=>{
+    if(!fMother.value){alert("يرجى اختيار رقم الأم");return;}
+    if(!fDate.value){alert("يرجى إدخال تاريخ الولادة");return;}
+    var parts=fMother.value.split("|");
+    var selNum=parts[0],selType=parts[1]||"";
+    var genderSelects=Array.from(genderFieldsWrap.querySelectorAll("select"));
+    var sharedNotes=fNotes.value.trim();
+    for(var i=0;i<genderSelects.length;i++){
+      var data={id:uid(),motherNumber:selNum,motherType:selType,birthDate:fDate.value,gender:genderSelects[i].value,notes:sharedNotes};
+      await saveBirth(data);
+    }
+    set({modal:null,tab:"births"});
+  }},"✅ إضافة المولود");
+  box.appendChild(addBtn);
+
+  [1,2,3].forEach(function(n){
+    var btnEl=countBar.children[n-1];
+    btnEl.addEventListener("click",function(){
+      addBtn.textContent=selectedCount>1?("✅ إضافة "+selectedCount+" مواليد"):"✅ إضافة المولود";
+    });
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
